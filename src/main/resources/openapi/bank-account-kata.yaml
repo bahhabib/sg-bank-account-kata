@@ -1,0 +1,211 @@
+openapi: 3.0.0
+info:
+  title: bankaccount
+  description: bankaccount
+  version: 1.0.0
+servers:
+  - url: 'https'
+paths:
+  /bank-account-kata/{accountId}/deposit:
+    post:
+      summary: deposit money from a customer to his account
+      operationId: deposit
+      parameters:
+        - name: accountId
+          in: path
+          description: account id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionDTO'
+        required: true
+      responses:
+        '200':
+          description: Successful deposit transaction.
+          content:
+            application/json:
+              schema:
+                type: boolean
+        '400':
+          description: Invalid ID customer
+        '403':
+          description:  Deposit  not authorized
+        '404':
+          description: customer not found.
+  /bank-account-kata/{accountId}/withDraw:
+    post:
+      summary: As a bank, withdraw money from a customer account, is allowed when no overdraft used
+      operationId: withdraw
+      parameters:
+        - name: accountId
+          in: path
+          description: account id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionDTO'
+        required: true
+      responses:
+        '200':
+          description: Successful withdraw transaction.
+          content:
+            application/json:
+              schema:
+                type: boolean
+        '400':
+          description: Invalid ID customer
+        '403':
+          description:  withdraw  not authorized
+        '404':
+          description: customer not found.
+  /bank-account-kata/{customerId}/accounts:
+    get:
+      summary: As a bank, a customer can display its accounts  and balance
+      operationId: display
+      parameters:
+        - name: customerId
+          in: path
+          description: customer id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful account balance display.
+          content:
+            application/json:
+              schema:
+                type: array
+                minItems: 0
+                items:
+                  $ref: '#/components/schemas/AccountDTO'
+        '400':
+          description: Invalid ID customer
+        '403':
+          description:  display  not authorized
+        '404':
+          description: customer not found.
+  /bank-account-kata/{customerId}/balance:
+    get:
+      summary: As a bank, a customer can display its account balance
+      operationId: displayBalance
+      parameters:
+        - name: customerId
+          in: path
+          description: customer id
+          required: true
+          schema:
+            type: string
+        - name: accountId
+          in: path
+          description: account id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful account balance display.
+          content:
+            application/json:
+              schema:
+                type: number
+        '400':
+          description: Invalid ID customer
+        '403':
+          description:  display  not authorized
+        '404':
+          description: customer not found.
+  /bank-account-kata/{customerId}/transactions:
+    get:
+      summary: As a bank, a customer can display its account transactions history
+      operationId: displayTransactions
+      parameters:
+        - name: customerId
+          in: path
+          description: customer id
+          required: true
+          schema:
+            type: string
+        - name: accountId
+          in: path
+          description: account id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful transaction display.
+          content:
+            application/json:
+              schema:
+                type: array
+                minItems: 0
+                items:
+                  $ref: '#/components/schemas/TransactionDTO'
+        '400':
+          description: Invalid ID customer
+        '403':
+          description:  display  not authorized
+        '404':
+          description: customer not found.
+components:
+  schemas:
+    AccountDTO:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+        closingBalance:
+          type: number
+        customer:
+          type: string
+        transactions:
+          type: array
+          uniqueItems: true
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/TransactionDTO'
+    TransactionDTO:
+      type: object
+      required:
+        - amount
+      properties:
+        id:
+          type: string
+        amount:
+          type: number
+          format: double
+        transactionType:
+          type: string
+          enum: [ DEPOSIT,  WITHDRAW ]
+        date:
+          type: string
+          format: date
+    CustomerDTO:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        accounts:
+          type: array
+          uniqueItems: true
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/AccountDTO'
+
+
+
